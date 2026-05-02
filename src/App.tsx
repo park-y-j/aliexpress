@@ -267,7 +267,8 @@ const SearchPage = () => {
     setError(null);
     setDebugInfo(null);
     try {
-      const response = await axios.get(`/api/coupang/search?keyword=${encodeURIComponent(q)}`, {
+      const apiPath = site === 'ali' ? '/api/ali/search' : '/api/coupang/search';
+      const response = await axios.get(`${apiPath}?keyword=${encodeURIComponent(q)}`, {
         timeout: 20000, // 20 seconds
         headers: {
           'Accept': 'application/json'
@@ -539,8 +540,8 @@ const SearchPage = () => {
                         <span className="text-red-500 uppercase">Warning: Fallback Active</span>
                       </div>
                       <div className="space-y-2">
-                        <p>• Endpoint: {window.location.origin}/api/coupang/search</p>
-                        <p>• Fallback Type: {results.some(r => r.productId?.startsWith('cfb_')) ? 'Client-side' : 'Server-side'}</p>
+                        <p>• Endpoint: {window.location.origin}{isAli ? '/api/ali/search' : '/api/coupang/search'}</p>
+                        <p>• Fallback Type: {results.some(r => r.productId?.startsWith('cf_') || r.productId?.startsWith('ali_')) ? 'Client-side' : 'Server-side'}</p>
                         {debugInfo ? (
                           <div>
                             <p className="font-bold mt-2 text-gray-700 not-italic">Server Response Log:</p>

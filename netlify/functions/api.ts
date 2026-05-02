@@ -170,6 +170,42 @@ router.get("/coupang/search", async (req, res) => {
   });
 });
 
+// AliExpress API Proxy (Mockup for now)
+router.get("/ali/search", async (req, res) => {
+  const { keyword } = req.query;
+  if (!keyword) return res.status(400).json({ error: "Keyword is required" });
+
+  res.json({
+    data: [
+      {
+        productId: `ali_1`,
+        productName: `[알리익스프레스] ${keyword} 해외직구 베스트`,
+        productPrice: 12500,
+        productImage: "https://picsum.photos/seed/ali1/400/400",
+        productUrl: `https://s.click.aliexpress.com/e/_DDAfHlF?target_url=https://www.aliexpress.com/wholesale?SearchText=${encodeURIComponent(keyword as string)}`,
+        isAli: true
+      },
+      {
+        productId: `ali_2`,
+        productName: `[특가주문] ${keyword} 글로벌 히트 상품`,
+        productPrice: 8900,
+        productImage: "https://picsum.photos/seed/ali2/400/400",
+        productUrl: `https://s.click.aliexpress.com/e/_DDAfHlF?target_url=https://www.aliexpress.com/wholesale?SearchText=${encodeURIComponent(keyword as string)}`,
+        isAli: true
+      },
+      {
+        productId: `ali_3`,
+        productName: `[무료배송] ${keyword} 가성비 갑 아이템`,
+        productPrice: 24300,
+        productImage: "https://picsum.photos/seed/ali3/400/400",
+        productUrl: `https://s.click.aliexpress.com/e/_DDAfHlF?target_url=https://www.aliexpress.com/wholesale?SearchText=${encodeURIComponent(keyword as string)}`,
+        isAli: true
+      }
+    ],
+    is_ali: true
+  });
+});
+
 // Image Proxy
 router.get("/proxy-image", async (req, res) => {
   const { url } = req.query;
