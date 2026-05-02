@@ -1,0 +1,87 @@
+{
+  "entities": {
+    "LandingConfig": {
+      "title": "Landing Page Configuration",
+      "description": "Stores the dynamic content for the 1688 landing page.",
+      "type": "object",
+      "properties": {
+        "mainImageUrl": {
+          "type": "string",
+          "description": "URL of the main product image/GIF."
+        },
+        "priceLink": {
+          "type": "string",
+          "description": "URL for the 'View Price' button."
+        },
+        "ctaText": {
+          "type": "string",
+          "description": "Custom text for the CTA button."
+        },
+        "ctaImageUrl": {
+          "type": "string",
+          "description": "URL of the image to use for the CTA button."
+        },
+        "blogs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "title": { "type": "string" },
+              "type": { "type": "string", "enum": ["internal", "external"] },
+              "link": { "type": "string" },
+              "content": { "type": "string" },
+              "footerImageUrl": { "type": "string" },
+              "footerImageLink": { "type": "string" },
+              "ctaText": { "type": "string" },
+              "ctaLink": { "type": "string" },
+              "ctaImageUrl": { "type": "string" }
+            },
+            "required": ["id", "title", "type"]
+          },
+          "description": "List of blog posts (internal or external)."
+        },
+        "youtubes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List of YouTube video IDs."
+        },
+        "youtubeComments": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List of comments for each YouTube video."
+        },
+        "products": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "imageUrl": { "type": "string" },
+              "title": { "type": "string" },
+              "link": { "type": "string" },
+              "buttonText": { "type": "string" }
+            },
+            "required": ["id", "imageUrl", "title", "link"]
+          },
+          "description": "List of 5 products to display on category pages."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["mainImageUrl", "priceLink", "blogs", "youtubes"]
+    }
+  },
+  "firestore": {
+    "config/landing": {
+      "schema": "LandingConfig",
+      "description": "The singleton configuration for the main landing page."
+    },
+    "categories/{categoryId}": {
+      "schema": "LandingConfig",
+      "description": "Configuration for each specific category page."
+    }
+  }
+}

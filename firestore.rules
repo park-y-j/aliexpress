@@ -1,0 +1,82 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: config
+    // Document ID: landing
+    // Fields:
+    //   - mainImageUrl: string (required)
+    //   - priceLink: string (required)
+    //   - ctaText: string (optional)
+    //   - ctaImageUrl: string (optional)
+    //   - blogs: list of maps (required)
+    //     - id: string
+    //     - title: string
+    //     - type: string (internal/external)
+    //     - link: string (optional)
+    //     - content: string (optional)
+    //     - footerImageUrl: string (optional)
+    //     - footerImageLink: string (optional)
+    //     - ctaText: string (optional)
+    //     - ctaLink: string (optional)
+    //     - ctaImageUrl: string (optional)
+    //   - youtubes: list of strings (required)
+    //   - youtubeComments: list of strings (optional)
+    //   - updatedAt: timestamp (optional)
+    //
+    // ===============================================================
+
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // 0.1 Connectivity Test
+    match /test/connection {
+      allow read: if true;
+    }
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (request.auth.token.email.lower() == "woom2211@gmail.com" ||
+         request.auth.uid == "U9hYeNrfD0cwiPOAkgsurgEzDzX2" ||
+         (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'));
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidLandingConfig(data) {
+      let allowedFields = ['siteId', 'id', 'name', 'mainTitle', 'mainImageUrl', 'mainImageAlt', 'mainContent', 'mainYoutubeId', 'mainComment', 'mainAspectRatio', 'mainImageUrlVitamin', 'priceLink', 'ctaText', 'ctaImageUrl', 'footerNotice', 'blogs', 'youtubes', 'youtubeAspectRatios', 'youtubeComments', 'products', 'updatedAt', 'seoTitle', 'seoDescription', 'seoKeywords'];
+      return data.keys().hasOnly(allowedFields);
+    }
+
+    match /config/{configId} {
+      allow read: if true;
+      allow write: if isAdmin() && isValidId(configId) && isValidLandingConfig(request.resource.data);
+    }
+
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow write: if isAdmin() && isValidId(categoryId) && isValidLandingConfig(request.resource.data);
+    }
+
+    match /users/{userId} {
+      allow read: if isAuthenticated() && request.auth.uid == userId;
+      allow write: if isAdmin() || (isAuthenticated() && request.auth.uid == userId);
+    }
+  }
+}
